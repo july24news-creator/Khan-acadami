@@ -1,0 +1,7 @@
+{
+  "name": "AstharHat E-Commerce",
+  "description": "A modern e-commerce search platform inspired by global B2B marketplaces, featuring AI-powered deep search, category navigation, and product recommendations.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
