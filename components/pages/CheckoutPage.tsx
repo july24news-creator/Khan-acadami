@@ -1,17 +1,15 @@
 
 import React, { useState } from 'react';
 import { useCart } from '../../context/CartContext';
-import { ArrowLeft, CheckCircle, MapPin, Truck, CreditCard, ShieldCheck, ExternalLink } from 'lucide-react';
+import { ArrowLeft, MapPin, Truck, CreditCard, ShieldCheck } from 'lucide-react';
 
 interface CheckoutPageProps {
   onNavigate: (view: string) => void;
 }
 
 const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
-  const { cartItems, totalItems, clearCart } = useCart();
-  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+  const { cartItems, clearCart, setLastOrder, setIsCartOpen } = useCart();
   const [isLoading, setIsLoading] = useState(false);
-  const [trackingNumber, setTrackingNumber] = useState('');
 
   // Form State
   const [formData, setFormData] = useState({
@@ -44,59 +42,20 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
     // Simulate API call
     setTimeout(() => {
         setIsLoading(false);
-        setTrackingNumber(`TRK-${Math.floor(Math.random() * 10000000)}`);
-        setIsOrderPlaced(true);
+        const trackingNumber = `TRK-${Math.floor(Math.random() * 10000000)}`;
+        
+        // Update Context with Order Details
+        setLastOrder({
+            trackingNumber,
+            total,
+            email: formData.email
+        });
+
         clearCart();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setIsCartOpen(true); // Open the drawer to show success message
+        onNavigate('home'); // Go back to home
     }, 1500);
   };
-
-  if (isOrderPlaced) {
-    return (
-        <div className="max-w-3xl mx-auto py-12 px-4 min-h-[60vh] flex flex-col items-center justify-center text-center animate-in zoom-in duration-300">
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                <CheckCircle size={48} className="text-green-600" />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h1>
-            <p className="text-gray-500 mb-8 max-w-md">
-                Thank you, {formData.firstName}. Your order has been confirmed and will be shipped to <span className="font-medium text-gray-800">{formData.address}, {formData.localPlace}, {formData.zila}</span> soon.
-            </p>
-            
-            {/* Tracking Section */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8 w-full max-w-md shadow-sm">
-                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-                    <span className="text-gray-500 text-sm font-medium">Tracking Number</span>
-                    <span className="font-mono font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded tracking-wider">{trackingNumber}</span>
-                </div>
-                <div className="flex flex-col gap-3">
-                     <p className="text-xs text-gray-400 text-left">
-                        Your tracking information has been emailed to {formData.email}.
-                    </p>
-                    <a href="#" className="w-full bg-white border border-[#ff6600] text-[#ff6600] py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition flex items-center justify-center gap-2">
-                        Track Order Status <ExternalLink size={14} />
-                    </a>
-                </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6 w-full max-w-md mb-8 border border-gray-200">
-                <div className="flex justify-between mb-2">
-                    <span className="text-gray-500">Estimated Delivery</span>
-                    <span className="font-medium text-gray-900">3-5 Business Days</span>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-gray-500">Total Amount</span>
-                    <span className="font-bold text-orange-600">৳{total.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                </div>
-            </div>
-            <button 
-                onClick={() => onNavigate('home')}
-                className="bg-[#ff6600] text-white px-8 py-3 rounded-xl font-bold hover:bg-orange-700 transition shadow-lg shadow-orange-200"
-            >
-                Continue Shopping
-            </button>
-        </div>
-    );
-  }
 
   if (cartItems.length === 0) {
       return (

@@ -2,6 +2,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, CartItem } from '../types';
 
+interface Order {
+  trackingNumber: string;
+  total: number;
+  email: string;
+}
+
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (product: Product) => void;
@@ -10,6 +16,8 @@ interface CartContextType {
   totalItems: number;
   isCartOpen: boolean;
   setIsCartOpen: (isOpen: boolean) => void;
+  lastOrder: Order | null;
+  setLastOrder: (order: Order | null) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -25,6 +33,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [lastOrder, setLastOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     localStorage.setItem('astharhat_cart', JSON.stringify(cartItems));
@@ -40,6 +49,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return [...prev, { ...product, quantity: 1 }];
     });
+    setLastOrder(null); // Clear last order when user adds new items
     setIsCartOpen(true); // Open cart when item is added
   };
 
@@ -61,7 +71,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearCart,
       totalItems,
       isCartOpen,
-      setIsCartOpen
+      setIsCartOpen,
+      lastOrder,
+      setLastOrder
     }}>
       {children}
     </CartContext.Provider>

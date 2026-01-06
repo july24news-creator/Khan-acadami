@@ -55,9 +55,12 @@ const App: React.FC = () => {
   const handleNavigate = (view: string) => {
     setCurrentView(view);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // When navigating home (e.g. Continue Shopping), reset search to show landing page
     if (view === 'home') {
-        // Optional: reset search when going home explicitly?
-        // setHasSearched(false);
+        setHasSearched(false);
+        setSearchTitle('');
+        setResults([]);
     }
   };
 
